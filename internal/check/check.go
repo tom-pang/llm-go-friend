@@ -10,6 +10,7 @@ type Violation struct {
 	File      string `toon:"file"`
 	Line      int    `toon:"line"`
 	Check     string `toon:"check"`
+	Name      string `toon:"name"`
 	Value     int    `toon:"value"`
 	Threshold int    `toon:"threshold"`
 }
