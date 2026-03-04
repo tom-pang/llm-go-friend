@@ -18,46 +18,7 @@ func checkComplexity(fset *token.FileSet, file *ast.File, filename string) []Vio
 		if !ok {
 			continue
 		}
-		complexity := 1 // the function itself is one path
-		ast.Inspect(fn.Body, func(n ast.Node) bool {
-			if n == nil {
-				return false
-			}
-			switch n := n.(type) {
-			case *ast.IfStmt:
-				complexity++
-			case *ast.ForStmt:
-				complexity++
-			case *ast.RangeStmt:
-				complexity++
-			case *ast.SwitchStmt:
-				for _, s := range n.Body.List {
-					cc := s.(*ast.CaseClause)
-					if cc.List != nil { // skip default
-						complexity++
-					}
-				}
-			case *ast.TypeSwitchStmt:
-				for _, s := range n.Body.List {
-					cc := s.(*ast.CaseClause)
-					if cc.List != nil {
-						complexity++
-					}
-				}
-			case *ast.SelectStmt:
-				for _, s := range n.Body.List {
-					cc := s.(*ast.CommClause)
-					if cc.Comm != nil { // nil Comm = default
-						complexity++
-					}
-				}
-			case *ast.BinaryExpr:
-				if n.Op == token.LAND || n.Op == token.LOR {
-					complexity++
-				}
-			}
-			return true
-		})
+		complexity := funcComplexity(fn)
 		if complexity <= complexityThreshold {
 			continue
 		}
@@ -71,4 +32,60 @@ func checkComplexity(fset *token.FileSet, file *ast.File, filename string) []Vio
 		})
 	}
 	return violations
+}
+
+func funcComplexity(fn *ast.FuncDecl) int {
+	complexity := 1
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		if n == nil {
+			return false
+		}
+		complexity += nodeComplexity(n)
+		return true
+	})
+	return complexity
+}
+
+func nodeComplexity(n ast.Node) int {
+	switch n := n.(type) {
+	case *ast.IfStmt:
+		return 1
+	case *ast.ForStmt:
+		return 1
+	case *ast.RangeStmt:
+		return 1
+	case *ast.SwitchStmt:
+		return countCaseClauses(n.Body)
+	case *ast.TypeSwitchStmt:
+		return countCaseClauses(n.Body)
+	case *ast.SelectStmt:
+		return countCommClauses(n.Body)
+	case *ast.BinaryExpr:
+		if n.Op == token.LAND || n.Op == token.LOR {
+			return 1
+		}
+	}
+	return 0
+}
+
+func countCaseClauses(body *ast.BlockStmt) int {
+	count := 0
+	for _, stmt := range body.List {
+		cc := stmt.(*ast.CaseClause)
+		if cc.List != nil {
+			count++
+		}
+	}
+	return count
+}
+
+func countCommClauses(body *ast.BlockStmt) int {
+	count := 0
+	for _, stmt := range body.List {
+		cc := stmt.(*ast.CommClause)
+		if cc.Comm != nil {
+			count++
+		}
+	}
+	return count
 }

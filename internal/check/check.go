@@ -27,8 +27,8 @@ var checkers []Checker
 // returns all violations.
 func RunAll(fset *token.FileSet, file *ast.File, filename string) []Violation {
 	var violations []Violation
-	for _, c := range checkers {
-		violations = append(violations, c(fset, file, filename)...)
+	for _, checker := range checkers {
+		violations = append(violations, checker(fset, file, filename)...)
 	}
 	return violations
 }

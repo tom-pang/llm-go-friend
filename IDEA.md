@@ -34,7 +34,6 @@ The checks are backed by published research:
 | Cyclomatic complexity | >10 per function | Yes (`go/ast`) |
 | Parameter count | >5 per function | Yes (`go/ast`) |
 | Bare `interface{}` / `any` params | Flag on exported functions | Yes (`go/ast`) |
-| Single-letter variables | Outside `i,j,k` in loops | Yes (`go/ast`) |
 
 ### Not checked (need LLM or human judgment)
 
@@ -52,8 +51,10 @@ These remain in the `llm-friendly-check` skill as a manual review checklist.
 2. Useful as a pre-commit hook or CI check
 3. Reports violations with file, line, and current value vs threshold
 4. Non-zero exit on violations
-5. Configurable thresholds via flags or config file
-6. Go only — no ambition to be multi-language
+5. No configuration — hardcoded research-backed thresholds
+6. Output in TOON format (only consumer is an LLM agent)
+7. Accepts explicit file list (not whole module)
+8. Go only — no ambition to be multi-language
 
 ## Sources
 
