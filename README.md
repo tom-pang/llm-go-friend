@@ -6,6 +6,10 @@ LLMs write Go that compiles and passes tests but is structurally hostile to the 
 
 `llm-go-friend` catches these structural problems at the AST level and outputs machine-readable violations in [TOON](https://github.com/toon-format/spec) format, so agents can parse the results and fix their own mess.
 
+## Claude Code Skill
+
+The repo includes a Claude Code skill at `skills/llm-go-friend/SKILL.md` that pairs the tool with manual judgment checks an LLM reviewer should perform (stale comments, excessive indirection, implicit behavior, inconsistent patterns, missing type context). The skill runs `llm-go-friend` for the mechanical checks and guides the reviewer through the things the tool can't detect.
+
 ## Install
 
 ```
@@ -52,7 +56,3 @@ The thresholds are opinionated. They're set for LLM-generated code, which tends 
 The bare interface check only fires on exported functions. Unexported functions accepting `any` is a code smell but not the same category of problem — exported APIs with bare interfaces make the whole package harder for agents to use correctly.
 
 No `//nolint` or suppression mechanism. This is intentional. Suppression comments are the first thing an agent adds when it can't figure out how to fix the real problem.
-
-## Claude Code Skill
-
-The repo includes a Claude Code skill at `skills/llm-go-friend/SKILL.md` that pairs the tool with manual judgment checks an LLM reviewer should perform (stale comments, excessive indirection, implicit behavior, inconsistent patterns, missing type context). The skill runs `llm-go-friend` for the mechanical checks and guides the reviewer through the things the tool can't detect.
