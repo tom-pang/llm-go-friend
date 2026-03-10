@@ -3,6 +3,7 @@ package check
 import (
 	"go/ast"
 	"go/token"
+	"strings"
 )
 
 // Violation represents a single check failure.
@@ -22,6 +23,11 @@ type Checker func(fset *token.FileSet, file *ast.File, filename string) []Violat
 // Each checker file appends to this slice via init() — acceptable here
 // since it's registering constant config, not mutable state.
 var checkers []Checker
+
+// isTestFile reports whether filename is a Go test file.
+func isTestFile(filename string) bool {
+	return strings.HasSuffix(filename, "_test.go")
+}
 
 // RunAll runs every registered checker against the given file and
 // returns all violations.

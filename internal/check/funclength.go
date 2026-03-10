@@ -12,6 +12,9 @@ func init() {
 }
 
 func checkFuncLength(fset *token.FileSet, file *ast.File, filename string) []Violation {
+	if isTestFile(filename) {
+		return nil
+	}
 	var violations []Violation
 	for _, decl := range file.Decls {
 		fn, ok := decl.(*ast.FuncDecl)

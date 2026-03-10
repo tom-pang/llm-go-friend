@@ -12,6 +12,9 @@ func init() {
 }
 
 func checkFileLength(fset *token.FileSet, file *ast.File, filename string) []Violation {
+	if isTestFile(filename) {
+		return nil
+	}
 	lineCount := fset.File(file.Pos()).LineCount()
 	if lineCount <= fileLengthThreshold {
 		return nil
